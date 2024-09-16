@@ -4,7 +4,7 @@ import 'package:student_api_crud_assignment/models/student.dart';
 
 
 class StudentRepository {
-  final String baseUrl = 'http://your_api_url_here/api/students';
+  final String baseUrl = 'http://10.0.2.2:8000/api/allStudents';
 
   Future<List<Student>> fetchStudents() async {
     final response = await http.get(Uri.parse(baseUrl));

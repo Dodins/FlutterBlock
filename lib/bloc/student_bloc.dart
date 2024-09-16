@@ -9,7 +9,7 @@ import '../models/student.dart';
 import 'student_state.dart';
 
 class StudentBloc extends Bloc<StudentEvent, StudentState> {
-  final String apiUrl = 'http://10.0.2.2:8000/api/students';
+  final String apiUrl = 'http://10.0.2.2:8000/api/allStudents';
 
   StudentBloc() : super(StudentInitial()) {
     on<LoadStudents>((event, emit) async {
@@ -30,7 +30,8 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
 
     on<AddStudent>((event, emit) async {
       try {
-        final response = await http.post(Uri.parse(apiUrl),
+        final response = await http.post(
+            Uri.parse('http://10.0.2.2:8000/api/students'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode(event.studentData));
         if (response.statusCode == 201) {
