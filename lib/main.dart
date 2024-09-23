@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => StudentBloc(),
       child: MaterialApp(
-        title: 'Student Management',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),

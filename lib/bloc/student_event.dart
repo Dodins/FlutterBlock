@@ -26,4 +26,7 @@ class DeleteStudent extends StudentEvent {
   final int id;
 
   const DeleteStudent(this.id);
+
+  @override
+  List<Object> get props => [id];
 }

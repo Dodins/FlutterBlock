@@ -42,25 +42,90 @@ class _StudentListScreenState extends State<StudentListScreen> {
             return Center(child: CircularProgressIndicator());
           } else if (state is StudentLoaded) {
             final students = state.students;
+            // Check if students list is empty
+            if (students.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No Data Available',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+              );
+            }
             return ListView.builder(
               itemCount: students.length,
               itemBuilder: (context, index) {
                 final student = students[index];
-                return ListTile(
-                  title: Text('${student.firstName} ${student.lastName}'),
-                  subtitle: Text('${student.course} - ${student.year}'),
-                  trailing: student.enrolled
-                      ? Icon(Icons.check_circle, color: Colors.green)
-                      : Icon(Icons.cancel, color: Colors.red),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            StudentFormScreen(student: student),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the form screen with the selected student data
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StudentFormScreen(
+                            student: student,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
                       ),
-                    );
-                  },
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${student.firstName} ${student.lastName}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Course: ${student.course}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Year: ${student.year}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              student.enrolled
+                                  ? 'Enrolled: Yes'
+                                  : 'Enrolled: No',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: student.enrolled
+                                    ? Colors.green
+                                    : Colors.red,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            Center(
+                              child: Text(
+                                'Tap to Edit',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 );
               },
             );

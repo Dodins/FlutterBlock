@@ -43,104 +43,216 @@ class _StudentFormScreenState extends State<StudentFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.student == null ? 'Add Student' : 'Edit Student'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                initialValue: _firstName,
-                decoration: InputDecoration(labelText: 'First Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a first name';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _firstName = value!;
-                },
-              ),
-              TextFormField(
-                initialValue: _lastName,
-                decoration: InputDecoration(labelText: 'Last Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a last name';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _lastName = value!;
-                },
-              ),
-              TextFormField(
-                initialValue: _course,
-                decoration: InputDecoration(labelText: 'Course'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a course';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _course = value!;
-                },
-              ),
-              DropdownButtonFormField<String>(
-                value: _year,
-                decoration: InputDecoration(labelText: 'Year'),
-                items: ['First Year', 'Second Year', 'Third Year', 'Fourth Year', 'Fifth Year']
-                    .map((year) => DropdownMenuItem(
-                          value: year,
-                          child: Text(year),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _year = value!;
-                  });
-                },
-              ),
-              SwitchListTile(
-                title: Text('Enrolled'),
-                value: _enrolled,
-                onChanged: (bool value) {
-                  setState(() {
-                    _enrolled = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    final studentData = {
-                      'firstName': _firstName,
-                      'lastName': _lastName,
-                      'course': _course,
-                      'year': _year,
-                      'enrolled': _enrolled,
-                    };
-
-                    if (widget.student == null) {
-                      BlocProvider.of<StudentBloc>(context).add(AddStudent(studentData));
-                    } else {
-                      BlocProvider.of<StudentBloc>(context).add(UpdateStudent(widget.student!.id, studentData));
-                    }
-
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text('Save'),
-              ),
-            ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTextField(
+                  label: 'First Name',
+                  initialValue: _firstName,
+                  onSaved: (value) => _firstName = value!,
+                ),
+                SizedBox(height: 16),
+                _buildTextField(
+                  label: 'Last Name',
+                  initialValue: _lastName,
+                  onSaved: (value) => _lastName = value!,
+                ),
+                SizedBox(height: 16),
+                _buildTextField(
+                  label: 'Course',
+                  initialValue: _course,
+                  onSaved: (value) => _course = value!,
+                ),
+                SizedBox(height: 16),
+                _buildDropdown(),
+                SizedBox(height: 16),
+                _buildSwitch(),
+                SizedBox(height: 30),
+                widget.student == null
+                    ? _buildSaveButton(context)
+                    : _buildUpdateDeleteButtons(context),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required String initialValue,
+    required void Function(String?) onSaved,
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(fontSize: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.grey[100],
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.deepPurple),
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $label';
+        }
+        return null;
+      },
+      onSaved: onSaved,
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _year,
+      decoration: InputDecoration(
+        labelText: 'Year',
+        labelStyle: TextStyle(fontSize: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        filled: true,
+        fillColor: Colors.grey[100],
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.deepPurple),
+        ),
+      ),
+      items: [
+        'First Year',
+        'Second Year',
+        'Third Year',
+        'Fourth Year',
+        'Fifth Year'
+      ]
+          .map((year) => DropdownMenuItem(
+                value: year,
+                child: Text(year),
+              ))
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _year = value!;
+        });
+      },
+    );
+  }
+
+  Widget _buildSwitch() {
+    return SwitchListTile(
+      title: Text(
+        'Enrolled',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      value: _enrolled,
+      activeColor: Colors.green,
+      inactiveThumbColor: Colors.grey,
+      onChanged: (bool value) {
+        setState(() {
+          _enrolled = value;
+        });
+      },
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
+            final studentData = {
+              'firstName': _firstName,
+              'lastName': _lastName,
+              'course': _course,
+              'year': _year,
+              'enrolled': _enrolled,
+            };
+            BlocProvider.of<StudentBloc>(context).add(AddStudent(studentData));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Student Added Successfully!')),
+            );
+            Navigator.pop(context);
+          }
+        },
+        child: Text('Save'),
+      ),
+    );
+  }
+
+  Widget _buildUpdateDeleteButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              _formKey.currentState!.save();
+              final studentData = {
+                'firstName': _firstName,
+                'lastName': _lastName,
+                'course': _course,
+                'year': _year,
+                'enrolled': _enrolled,
+              };
+              BlocProvider.of<StudentBloc>(context)
+                  .add(UpdateStudent(widget.student!.id, studentData));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Student Updated Successfully!')),
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: Text('Update'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: () {
+            BlocProvider.of<StudentBloc>(context)
+                .add(DeleteStudent(widget.student!.id));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Student Deleted Successfully!')),
+            );
+            Navigator.pop(context);
+          },
+          child: Text('Delete'),
+        ),
+      ],
     );
   }
 }
