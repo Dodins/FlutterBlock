@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:student_api_crud_assignment/models/student.dart';
 
 class StudentRepository {
-  final String baseUrl = 'http://10.0.2.2:8000/api/allStudents';
-  //http://10.0.2.2:8000 - android url
-  //http://127.0.0.1:8000 - WEB and IOS url
+  final String baseUrl = 'http://10.0.2.2:8000/api/students';
+
+  //http://10.0.2.2:8000 - ANDROID URL
+  //http://127.0.0.1:8000 - WEB/IOS URL
 
   Future<List<Student>> fetchStudents() async {
     final response = await http.get(Uri.parse(baseUrl));
